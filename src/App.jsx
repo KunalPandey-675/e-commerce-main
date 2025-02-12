@@ -9,7 +9,7 @@ import Order from "./pages/order/Order";
 import Cart from "./pages/cart/Cart";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import NoPage from "./pages/nopage/NoPage";
-import MyState from "./context/myState";  // Corrected import path
+import MyState from "./context/data/MyState";  // Corrected import path
 import Login from "./pages/registration/Login";
 import Productinfo from "./pages/productinfo/Productinfo";
 import Signup from "./pages/registration/Signup";
