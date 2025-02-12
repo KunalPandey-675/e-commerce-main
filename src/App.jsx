@@ -2,14 +2,14 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
- Navigate } from "react-router-dom";
+  Navigate } from "react-router-dom";
 
 import Home from './pages/home/Home';
 import Order from "./pages/order/Order";
 import Cart from "./pages/cart/Cart";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import NoPage from "./pages/nopage/NoPage";
-import MyState from "./context/data/myState"; // Update the path to the correct location of MyState
+import MyState from "./context/myState";  // Corrected import path
 import Login from "./pages/registration/Login";
 import Productinfo from "./pages/productinfo/Productinfo";
 import Signup from "./pages/registration/Signup";
@@ -30,25 +30,24 @@ function App() {
         } />
         <Route path="/cart" element={<Cart/>} />
         <Route path="/dashboard" element={
-          
+          <AdminRoute>
             <Dashboard/>
-          
+          </AdminRoute>
         } />
-        <Route path= "/login" element={<Login/>} />
-        <Route path= "/signup" element={<Signup/>} />
-        <Route path= "/productinfo/:id" element={<Productinfo/>} />
-        <Route path= "/addproduct" element={
-          
+        <Route path="/login" element={<Login/>} />
+        <Route path="/signup" element={<Signup/>} />
+        <Route path="/productinfo/:id" element={<Productinfo/>} />
+        <Route path="/addproduct" element={
+          <AdminRoute>
             <AddProduct/>
-          
+          </AdminRoute>
         } />
         <Route path="/updateproduct" element={
-          
+          <AdminRoute>
             <UpdateProduct/>
-          
+          </AdminRoute>
         } />
         <Route path="/*" element={<NoPage/>} />
-        
       </Routes>
     </Router>
     </MyState>
@@ -58,18 +57,17 @@ function App() {
 export default App
 
 export const ProtectedRoute = ({ children }) => {
- const user = localStorage.getItem('user')
- if (user){
-  return children
- }else{
+  const user = localStorage.getItem('user')
+  if (user) {
+    return children
+  }
   return <Navigate to='/login' />
- }
 }
-// const ProtectedRouteForAdmin = ({ children }) => {
-//   const admin = JSON.parse(localStorage.getItem('user'))
-//   if (admin.user.email === 'kkakka@gmail.com' ){
-//     return children
-//   }else{
-//     return <Navigate to='/login' />
-//   }
-//   }
+
+export const AdminRoute = ({ children }) => {
+  const admin = JSON.parse(localStorage.getItem('user'))
+  if (admin?.user?.email === 'kkakka@gmail.com') {
+    return children
+  }
+  return <Navigate to='/login' />
+}
