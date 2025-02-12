@@ -1,5 +1,4 @@
- // Make sure to import useState
-import { useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
 import { Timestamp, collection, addDoc, onSnapshot, query, orderBy } from "firebase/firestore";
@@ -7,7 +6,7 @@ import { fireDB } from "../../firebase/FirebaseConfig"; // Adjust the path as ne
 import myContext from "./myContext";
 
 function MyState(props) {
-    const { mode, setMode } = useState('light'); // You might want to destructure the useState properly
+    const [mode, setMode] = useState('light'); // Fixed useState destructuring
 
     const toggleMode = () => {
         if (mode === 'light') {
