@@ -1,11 +1,43 @@
 /* eslint-disable react/no-unknown-property */
 // eslint-disable-next-line no-unused-vars
-import React, { useContext } from 'react'
- import './ProductCard.css'
- import myContext from '../../../context/data/myContext'
+import React, { useContext, useEffect, useState } from 'react'
+import './ProductCard.css'
+import myContext from '../../../context/data/myContext'
+
 function ProductCard() {
     const context = useContext(myContext)
     const { mode } = context
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        // Fetch products from both scraper files
+        const fetchProducts = async () => {
+            try {
+                const [kainicheResponse, regaliaResponse] = await Promise.all([
+                    fetch('/scrapers/kainiche_products.json'),
+                    fetch('/scrapers/regalia_ornaments_products.json')
+                ]);
+
+                const kainicheData = await kainicheResponse.json();
+                const regaliaData = await regaliaResponse.json();
+
+                // Get 5 products from each source
+                const selectedProducts = [
+                    ...kainicheData.slice(0, 5),  // First 5 from Kainiche
+                    ...regaliaData.slice(0, 5)    // First 5 from Regalia
+                ];
+
+                setProducts(selectedProducts);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                // Set some default products in case of error
+                setProducts([]);
+            }
+        };
+
+        fetchProducts();
+    }, []);
+
     return (
         <section className="text-gray-600 body-font">
             <div className="container px-5 py-8 md:py-16 mx-auto">
@@ -15,89 +47,46 @@ function ProductCard() {
                 </div>
 
                 <div className="flex flex-wrap -m-4">
-                    <div className="p-4 md:w-1/4  drop-shadow-lg " >
-                        <div className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out    border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
-                            <div className="flex justify-center cursor-pointer" >
-                                <img className=" rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110  duration-300 ease-in-out" src="https://nobero.com/cdn/shop/files/black_e4d19185-c19d-4e7c-a14a-8d2a29c7bad3.jpg?v=1711976456" alt="blog" />
-                            </div>
-                            <div className="p-5 border-t-2">
-                                <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>This is title</h1>
-                                {/* <p className="leading-relaxed mb-3">{item.description.}</p> */}
-                                <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹ 500</p>
-                                <div className=" flex justify-center">
-                                    <button type="button" className="focus:outline-none text-white bg-blue-600 hover:bg-yellow-300 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
+                    {products.map((product, index) => (
+                        <div key={index} className="p-4 md:w-1/4 lg:w-1/5 drop-shadow-lg"> {/* Adjusted width for 5 items per row on larger screens */}
+                            <div className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" 
+                                style={{ 
+                                    backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', 
+                                    color: mode === 'dark' ? 'white' : '' 
+                                }}>
+                                <div className="flex justify-center cursor-pointer">
+                                    <img 
+                                        className="rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110 duration-300 ease-in-out" 
+                                        src={product.image_url.startsWith('//') ? `https:${product.image_url}` : product.image_url}
+                                        alt={product.title.split('\n')[0].trim()} 
+                                    />
+                                </div>
+                                <div className="p-5 border-t-2">
+                                    <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" 
+                                        style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                        {index < 5 ? 'Kainiche' : 'Regalia'} {/* Show source of product */}
+                                    </h2>
+                                    <h1 className="title-font text-lg font-medium text-gray-900 mb-3" 
+                                        style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                        {product.title.split('\n')[0].trim()}
+                                    </h1>
+                                    <p className="leading-relaxed mb-3" 
+                                        style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                        {product.price.split('INR')[0].trim()}
+                                    </p>
+                                    <div className="flex justify-center">
+                                        <button type="button" 
+                                            className="focus:outline-none text-white bg-blue-600 hover:bg-pink-500 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full py-2">
+                                            Add To Cart
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-
-                    <div className="p-4 md:w-1/4  drop-shadow-lg " >
-                        <div className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out    border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
-                            <div className="flex justify-center cursor-pointer" >
-                                <img className=" rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110  duration-300 ease-in-out" src="https://dummyimage.com/720x400" alt="blog" />
-                            </div>
-                            <div className="p-5 border-t-2">
-                                <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>This is title</h1>
-                                {/* <p className="leading-relaxed mb-3">{item.description.}</p> */}
-                                <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹ 500</p>
-                                <div className=" flex justify-center">
-                                    <button type="button" className="focus:outline-none text-white bg-blue-600 hover:bg-pink-500 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div className="p-4 md:w-1/4  drop-shadow-lg " >
-                        <div className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out    border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
-                            <div className="flex justify-center cursor-pointer" >
-                                <img className=" rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110  duration-300 ease-in-out" src="https://dummyimage.com/720x400" alt="blog" />
-                            </div>
-                            <div className="p-5 border-t-2">
-                                <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>This is title</h1>
-                                {/* <p className="leading-relaxed mb-3">{item.description.}</p> */}
-                                <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹ 500</p>
-                                <div className=" flex justify-center">
-                                    <button type="button" className="focus:outline-none text-white bg-blue-600 hover:bg-green-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div className="p-4 md:w-1/4  drop-shadow-lg " >
-                        <div className="h-full border-2 hover:shadow-gray-100 hover:shadow-2xl transition-shadow duration-300 ease-in-out    border-gray-200 border-opacity-60 rounded-2xl overflow-hidden" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
-                            <div className="flex justify-center cursor-pointer" >
-                                <img className=" rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110  duration-300 ease-in-out" src="https://dummyimage.com/720x400" alt="blog" />
-                            </div>
-                            <div className="p-5 border-t-2">
-                                <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2>
-                                <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>This is title</h1>
-                                {/* <p className="leading-relaxed mb-3">{item.description.}</p> */}
-                                <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>₹ 500</p>
-                                <div className=" flex justify-center">
-                                    <button type="button" className="focus:outline-none text-white bg-blue-600 hover:bg-red-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    
-
+                    ))}
                 </div>
-
             </div>
-        </section >
-
+        </section>
     )
 }
 
